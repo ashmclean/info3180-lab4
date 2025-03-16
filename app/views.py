@@ -125,3 +125,10 @@ def files():
     images = get_uploaded_images()
     # Render a template with the list of images
     return render_template('files.html', images=images)
+
+@app.route('/logout')
+@login_required  # Ensure the user is logged in before allowing logout
+def logout():
+    logout_user()  # Logs out the user
+    flash('You have been successfully logged out.', 'info')  # Flash a message
+    return redirect(url_for('home'))  # Redirect to the home route
