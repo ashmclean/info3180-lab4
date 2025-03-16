@@ -7,7 +7,7 @@ from app.models import UserProfile
 from app.forms import LoginForm, UploadForm
 from werkzeug.security import check_password_hash
 
-
+app.config['UPLOAD_FOLDER'] = 'uploads' 
 ###
 # Routing for your application.
 ###
@@ -104,3 +104,24 @@ def add_header(response):
 def page_not_found(error):
     """Custom 404 page."""
     return render_template('404.html'), 404
+
+
+def get_uploaded_images():
+    # Get the absolute path to the uploads folder
+    upload_dir = os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER'])
+    # Get a list of files in the directory (only images)
+    return [f for f in os.listdir(upload_dir) if os.path.isfile(os.path.join(upload_dir, f))]
+
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    # Send the image file from the uploads folder
+    return send_from_directory(os.path.join(os.getcwd(), app.config['UPLOAD_FOLDER']), filename)
+
+# Route to list all uploaded images in the uploads folder
+@app.route('/files')
+@login_required
+def files():
+    # Get the list of uploaded images
+    images = get_uploaded_images()
+    # Render a template with the list of images
+    return render_template('files.html', images=images)
